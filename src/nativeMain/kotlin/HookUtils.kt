@@ -1,8 +1,9 @@
-import kotlinx.cinterop.invoke
 import platform.windows.*
 
-fun setHook(type: Int, callback: HOOKPROC): HHOOK? =
-    SetWindowsHookEx!!(type, callback, null, 0u)
+fun setHook(type: Int, callback: HOOKPROC): HHOOK {
+    val hMod = GetModuleHandleA(null)
+    return SetWindowsHookExA(type, callback, hMod, 0u)!!
+}
 
 fun removeHook(hook: HHOOK): Boolean = UnhookWindowsHookEx(hook).toBoolean()
 
