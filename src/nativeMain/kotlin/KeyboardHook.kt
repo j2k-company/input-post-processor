@@ -1,18 +1,24 @@
 import kotlinx.cinterop.staticCFunction
 import platform.windows.*
 
-class KeyboardHook {
-    private val hook: HHOOK
-    private var processHook = staticCFunction(::_processHook)
 
-    init {
-        hook = setHook(WH_KEYBOARD, processHook)!!
+private val hook: HHOOK = setHook(WH_KEYBOARD_LL, staticCFunction(::eventHook))
+
+private fun eventHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): LRESULT {
+    return if (!KeyboardHook.processHook(nCode, wParam, lParam))
+        nextHook(hook, nCode, wParam, lParam)
+    else 1
+}
+
+object KeyboardHook {
+    fun processHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): Boolean {
+        if (nCode < 0)
+            return false
+
+        return false
     }
 
-    private fun _processHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): LRESULT {
-        // process
-        return nextHook(hook, nCode, wParam, lParam)
+    fun dispose() {
+        removeHook(hook)
     }
-
-    fun disable() = removeHook(hook)
 }
