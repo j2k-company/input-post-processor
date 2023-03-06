@@ -7,7 +7,7 @@ fun main() {
 
     memScoped {
         val msg = alloc<MSG>()
-        while (GetMessage!!(msg.ptr, null, 0u, 0u).toInt() > 0) {
+        while (GetMessage!!(msg.ptr, null, 0u, 0u).toBoolean()) {
             TranslateMessage(msg.ptr)
             DispatchMessage!!(msg.ptr)
         }
