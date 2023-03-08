@@ -30,12 +30,14 @@ object KeyboardHook {
         when (wParam.toInt()) {
             WM_KEYDOWN, WM_SYSKEYDOWN -> {
                 if (keyCode == 0x35 && keyPressed(VK_SHIFT)) {
-                    if(keyInput) {
-                        replaceInput(cache.joinToString(""))
+                    keyInput = !keyInput
+
+                    if(!keyInput) {
+                        val replaced = replaceInput(cache.joinToString(""))
                         cache.clear()
+                        return replaced
                     }
 
-                    keyInput = !keyInput
                     return false
                 }
 
@@ -64,8 +66,20 @@ object KeyboardHook {
         else -> false
     }
 
-    fun replaceInput(key: String) {
-        TODO("Non yet implemented")
+    fun replaceInput(key: String): Boolean {
+        // HACK: a temporary implementation to test other functions
+        if (key == "NICK") {
+            (0..key.length).forEach { _ ->
+                sendInputChar(VK_BACK.toChar())
+            }
+            for (c in "Jaka2005") {
+                sendInputChar(c)
+            }
+
+            return true
+        }
+
+        return false
     }
 
     fun dispose() {
