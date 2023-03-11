@@ -13,6 +13,7 @@ private fun eventHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): LRESULT {
 }
 
 object KeyboardHook {
+    private val inputSynthesizer = InputSynthesizer()
     private val cache = mutableListOf<Char>()
     private var keyInput = false
 
@@ -32,7 +33,8 @@ object KeyboardHook {
                 if (keyCode == 0x35 && keyPressed(VK_SHIFT)) {
                     keyInput = !keyInput
 
-                    if(!keyInput) {
+                    if (!keyInput) {
+                        // TODO: if replaced is false i should switch keyPressed
                         val replaced = replaceInput(cache.joinToString(""))
                         cache.clear()
                         return replaced
@@ -42,7 +44,7 @@ object KeyboardHook {
                 }
 
                 if (keyInput && isPrintable(keyCode) && !modifierKeysPressed()) {
-                     cache.add(keyCode.toChar())
+                    cache.add(keyCode.toChar())
                 }
             }
 
@@ -69,13 +71,14 @@ object KeyboardHook {
     fun replaceInput(key: String): Boolean {
         // HACK: a temporary implementation to test other functions
         if (key == "NICK") {
-            (0..key.length).forEach { _ ->
-                sendInputChar(VK_BACK.toChar())
-            }
-            for (c in "Jaka2005") {
-                sendInputChar(c)
-            }
+            inputSynthesizer.apply {
+                releaseModifierKeys()
+                (0..key.length).forEach { _ ->
+                    sendKeyPress(VK_BACK)
+                }
 
+                sendText("jaka2005")
+            }
             return true
         }
 
