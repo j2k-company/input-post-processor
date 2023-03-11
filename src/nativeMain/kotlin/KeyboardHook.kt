@@ -14,6 +14,7 @@ private fun eventHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): LRESULT {
 
 object KeyboardHook {
     private val inputSynthesizer = InputSynthesizer()
+    private val preferences = Preferences("substitutions.json")
     private val cache = mutableListOf<Char>()
     private var keyInput = false
 
@@ -44,6 +45,7 @@ object KeyboardHook {
                 }
 
                 if (keyInput && isPrintable(keyCode) && !modifierKeysPressed()) {
+                    // TODO: rewrite with using VkData
                     cache.add(keyCode.toChar())
                 }
             }
@@ -68,16 +70,17 @@ object KeyboardHook {
         else -> false
     }
 
-    fun replaceInput(key: String): Boolean {
-        // HACK: a temporary implementation to test other functions
-        if (key == "NICK") {
+    private fun replaceInput(key: String): Boolean {
+        if (key in preferences.substitutions.keys) {
             inputSynthesizer.apply {
                 releaseModifierKeys()
                 (0..key.length).forEach { _ ->
                     sendKeyPress(VK_BACK)
                 }
 
-                sendText("jaka2005")
+                sendText(
+                    preferences.substitutions[key]!!
+                )
             }
             return true
         }
@@ -91,8 +94,4 @@ object KeyboardHook {
             hook = null
         }
     }
-}
-
-enum class KeyType {
-    PRINTABLE, MODIFIER, FUNCTION, CURSOR, TOGGLE, NUMPAD
 }

@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.7.21"
+    kotlin("plugin.serialization") version "1.7.21"
 }
 
 group = "site.j2k"
@@ -27,7 +28,11 @@ kotlin {
         }
     }
     sourceSets {
-        val nativeMain by getting
+        val nativeMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+            }
+        }
         val nativeTest by getting
     }
 }
