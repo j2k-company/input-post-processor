@@ -1,3 +1,12 @@
+// TODO: add HKL to VkData
+data class VkData(
+    val vkCode: Int,
+    val shift: Boolean = false,
+    val alt: Boolean = false,
+    val control: Boolean = false,
+    val win: Boolean = false,
+)
+
 sealed class InputData
 
 data class HardwareInput(

@@ -1,4 +1,7 @@
-import kotlinx.cinterop.*
+import exception.VkCodeNotFoundException
+import kotlinx.cinterop.allocArray
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.value
 import platform.windows.*
 
 fun setHook(type: Int, callback: HOOKPROC): HHOOK {
@@ -14,81 +17,47 @@ fun nextHook(hook: HHOOK, nCode: Int, wParam: WPARAM, lParam: LPARAM) =
 fun keyPressed(keyCode: Int) =
     (GetKeyState(keyCode).toInt() and 0x8000) == 0x8000
 
-// NOTE:XXX:FIXME: so far it supports only letters and numbers
-fun sendInputChar(symbol: Char) {
+fun vkKeyScan(char: Char, hkl: HKL): VkData {
+    val vkScan = VkKeyScanExA(char.code.toByte(), hkl).toInt()
+    if (vkScan and 0x8080 == 0x8080)
+        throw VkCodeNotFoundException(char,
+            "Could not get virtual code of the '\$char' for this keyboard layout")
+
+    val modifierData = vkScan and 0xff00
+
+    return VkData(
+        vkCode = vkScan and 0xff,
+        shift = modifierData and 1 == 1,
+        control = modifierData and 2 == 2,
+        alt = modifierData and 4 == 4,
+    )
+}
+
+fun getKeyboardLayout() = GetKeyboardLayout(0u)!!
+
+fun getKeyboardLayoutList(): List<HKL> {
+    val count = GetKeyboardLayoutList(0, null)
+    if (count == 0) {
+        // TODO: finish error processing
+        val (errorCode, message) = getLastError()
+        throw Exception()
+    }
+
     memScoped {
-        val vkCode = symbol.uppercaseChar().code
+        val layouts = allocArray<HKLVar>(count)
 
-        if (symbol.isUpperCase()) {
-            SendInput(
-                4u,
-                createInputs(
-                    listOf(
-                        createKeyInputData(VK_SHIFT),
-                        createKeyInputData(vkCode),
-                        createKeyInputData(vkCode, isDown = false),
-                        createKeyInputData(VK_SHIFT, isDown = false)
-                    )
-                ),
-                sizeOf<INPUT>().toInt()
-            )
-        } else {
-            SendInput(
-                2u,
-                createInputs(
-                    listOf(
-                        createKeyInputData(vkCode),
-                        createKeyInputData(vkCode, isDown = false),
-                    )
-                ),
-                sizeOf<INPUT>().toInt()
-            )
+        if (GetKeyboardLayoutList(count, layouts) == 0) {
+            // TODO: finish error processing
+            val (errorCode, message) = getLastError()
+            throw Exception()
         }
+
+        return cArrayToList(count, layouts).map { it.value!! }
     }
+
 }
 
-fun createInputs(data: List<InputData>): CArrayPointer<INPUT> = memScoped {
-    allocArray(data.size) { i ->
-        when (val inputData = data[i]) {
-            is MouseInput -> {
-                type = 0u
-                inputData.run {
-                    mi.dx = dX
-                    mi.dy = dY
-                    mi.mouseData = mouseData
-                    mi.dwFlags = dwFlags
-                    mi.time = time
-                    mi.dwExtraInfo = dwExtraInfo
-                }
-            }
-
-            is KeyboardInput -> {
-                type = 1u
-                inputData.run {
-                    ki.wVk = wVk
-                    ki.wScan = wScan
-                    ki.dwFlags = dwFlags
-                    ki.time = time
-                    ki.dwExtraInfo = dwExtraInfo
-                }
-            }
-
-            is HardwareInput -> {
-                type = 2u
-                inputData.run {
-                    hi.uMsg = uMsg
-                    hi.wParamL = wParamL
-                    hi.wParamH = wParamH
-                }
-            }
-        }
-    }
+// TODO: write the functionality for error handling
+fun getLastError(): Pair<Int, String> {
+    TODO("Not yet implemented")
 }
-
-fun createKeyInputData(vkCode: Int, isDown: Boolean = true) = KeyboardInput(
-    wVk = vkCode.toUShort(),
-    wScan = 0u,
-    dwFlags = (if (isDown) 0 else KEYEVENTF_KEYUP).toUInt(),
-    time = 0u,
-    dwExtraInfo = NULL.toLong().toULong()
-)
