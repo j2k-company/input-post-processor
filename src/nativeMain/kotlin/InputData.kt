@@ -1,10 +1,12 @@
-// TODO: add HKL to VkData
+import platform.windows.HKL
+
 data class VkData(
     val vkCode: Int,
+    val hkl: HKL,
     val shift: Boolean = false,
     val alt: Boolean = false,
     val control: Boolean = false,
-    val win: Boolean = false,
+    val win: Boolean = false
 )
 
 sealed class InputData

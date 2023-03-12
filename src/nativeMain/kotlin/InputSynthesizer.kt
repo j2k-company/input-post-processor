@@ -4,15 +4,26 @@ import platform.windows.*
 
 class InputSynthesizer {
 
-    // TODO: add keyboard layout handling
     fun sendText(text: String) {
         val vkData: List<VkData> = getKeyPressDataFromText(text)
 
         releaseModifierKeys()
 
+        val defaultHKL = getKeyboardLayout()
+        var currentHKL = defaultHKL
+
         vkData.forEach {
+            if (it.hkl != currentHKL) {
+                // TODO: Using other method for set specify keyboard layout
+                // HACK:XXX: It's working only for system with two hkl
+                nextKeyboardLayout()
+                currentHKL = it.hkl
+            }
+
             sendKeyPress(vkCode = it.vkCode, shiftPressed = it.shift)
         }
+
+        if (defaultHKL != currentHKL) nextKeyboardLayout()
     }
 
     private fun getKeyPressDataFromText(text: String): List<VkData> {
@@ -24,6 +35,29 @@ class InputSynthesizer {
         }
 
         return data
+    }
+
+    private fun nextKeyboardLayout() {
+        SendInput(
+            2u,
+            createInputs(
+                listOf(
+                    createKeyInputData(VK_LMENU),
+                    createKeyInputData(VK_LSHIFT),
+                )
+            ),
+            sizeOf<INPUT>().toInt()
+        )
+        SendInput(
+            2u,
+            createInputs(
+                listOf(
+                    createKeyInputData(VK_LMENU, isDown = false),
+                    createKeyInputData(VK_LSHIFT, isDown = false)
+                )
+            ),
+            sizeOf<INPUT>().toInt()
+        )
     }
 
     private fun getVkData(char: Char): VkData? {

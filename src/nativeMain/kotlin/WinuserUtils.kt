@@ -1,7 +1,5 @@
 import exception.VkCodeNotFoundException
-import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.value
+import kotlinx.cinterop.*
 import platform.windows.*
 
 fun setHook(type: Int, callback: HOOKPROC): HHOOK {
@@ -23,33 +21,33 @@ fun vkKeyScan(char: Char, hkl: HKL): VkData {
         throw VkCodeNotFoundException(char,
             "Could not get virtual code of the '\$char' for this keyboard layout")
 
-    val modifierData = vkScan and 0xff00
+    val modifierData = vkScan shr 8
 
     return VkData(
         vkCode = vkScan and 0xff,
         shift = modifierData and 1 == 1,
         control = modifierData and 2 == 2,
         alt = modifierData and 4 == 4,
+        hkl = hkl
     )
 }
 
-fun getKeyboardLayout() = GetKeyboardLayout(0u)!!
+fun getKeyboardLayout() = GetKeyboardLayout(
+    GetWindowThreadProcessId(GetForegroundWindow(), null)
+)!!
+
 
 fun getKeyboardLayoutList(): List<HKL> {
     val count = GetKeyboardLayoutList(0, null)
     if (count == 0) {
-        // TODO: finish error processing
-        val (errorCode, message) = getLastError()
-        throw Exception()
+        throwLastError()
     }
 
     memScoped {
         val layouts = allocArray<HKLVar>(count)
 
         if (GetKeyboardLayoutList(count, layouts) == 0) {
-            // TODO: finish error processing
-            val (errorCode, message) = getLastError()
-            throw Exception()
+            throwLastError()
         }
 
         return cArrayToList(count, layouts).map { it.value!! }
@@ -61,3 +59,23 @@ fun getKeyboardLayoutList(): List<HKL> {
 fun getLastError(): Pair<Int, String> {
     TODO("Not yet implemented")
 }
+
+fun throwLastError(): Nothing {
+    val (errorCode, message) = getLastError()
+    TODO("Not yet implemented")
+//    throw Exception()
+}
+
+fun activateKeyboardLayout(hkl: HKL) =
+    ActivateKeyboardLayout(hkl, KLF_SETFORPROCESS) ?: throwLastError()
+
+//fun sendLangChangeRequest(hkl: HKL) {
+//    PostMessage!!(GetForegroundWindow(), WM_INPUTLANGCHANGEREQUEST.toUInt(), 0u, hkl.toLong())
+//}
+//
+//fun previousKeyboardLayout() = memScoped {
+//    val zero = alloc<IntVar>().apply { value = 0 }
+//    val hkl = zero.reinterpret<HKL__>().ptr
+//
+//    activateKeyboardLayout(hkl)
+//}
