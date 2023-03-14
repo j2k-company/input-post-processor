@@ -49,7 +49,7 @@ object KeyboardHook {
                         info.scanCode.toInt(),
                         keyPressed(VK_SHIFT) xor keyToggled(VK_CAPITAL),
                         getKeyboardLayout()
-                    ))
+                    )!!)
                 } else if (keyInput && keyCode == VK_BACK) {
                     if (cache.size == 0) {
                         keyInput = !keyInput

@@ -99,9 +99,11 @@ fun keyCodeToChar(vkCode: Int, scanCode: Int, shiftPressed: Boolean, hkl: HKL) =
         1, 0u, hkl
     )
 
-    // TODO: handle the result
-
-    buff.value.toInt().toChar()
+    if (result < 0) {
+        null
+    } else {
+        buff.value.toInt().toChar()
+    }
 }
 
 //fun activateKeyboardLayout(hkl: HKL) =
