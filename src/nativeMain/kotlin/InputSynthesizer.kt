@@ -20,7 +20,10 @@ class InputSynthesizer {
                 currentHKL = it.hkl
             }
 
-            sendKeyPress(vkCode = it.vkCode, shiftPressed = it.shift)
+            sendKeyPress(
+                vkCode = it.vkCode,
+                shiftPressed = it.shift xor keyToggled(VK_CAPITAL)
+            )
         }
 
         if (defaultHKL != currentHKL) nextKeyboardLayout()

@@ -35,7 +35,6 @@ object KeyboardHook {
                     keyInput = !keyInput
 
                     if (!keyInput) {
-                        // TODO: if replaced is false i should switch keyPressed
                         val replaced = replaceInput(cache.joinToString(""))
                         cache.clear()
                         return replaced
@@ -45,8 +44,18 @@ object KeyboardHook {
                 }
 
                 if (keyInput && isPrintable(keyCode) && !modifierKeysPressed()) {
-                    // TODO: rewrite with using VkData
-                    cache.add(keyCode.toChar())
+                    cache.add(keyCodeToChar(
+                        keyCode,
+                        info.scanCode.toInt(),
+                        keyPressed(VK_SHIFT) xor keyToggled(VK_CAPITAL),
+                        getKeyboardLayout()
+                    ))
+                } else if (keyInput && keyCode == VK_BACK) {
+                    if (cache.size == 0) {
+                        keyInput = !keyInput
+                    } else {
+                        cache.removeAt(cache.lastIndex)
+                    }
                 }
             }
 
