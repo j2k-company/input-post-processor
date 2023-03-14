@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "site.j2k"
-version = "0.1"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
