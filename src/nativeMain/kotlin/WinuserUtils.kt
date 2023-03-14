@@ -60,15 +60,27 @@ fun getKeyboardLayoutList(): List<HKL> {
 
 }
 
-// TODO: write the functionality for error handling
-fun getLastError(): Pair<Int, String> {
-    TODO("Not yet implemented")
+fun getLastError(): Pair<Int, String> = memScoped {
+    val msgBuf: LPVOIDVar = alloc()
+    val errorCode = GetLastError()
+
+    FormatMessageA(
+        (FORMAT_MESSAGE_ALLOCATE_BUFFER or
+                FORMAT_MESSAGE_FROM_SYSTEM or
+                FORMAT_MESSAGE_IGNORE_INSERTS).toUInt(),
+        null,
+        errorCode,
+        LANG_USER_DEFAULT,
+        msgBuf.ptr.reinterpret(),
+        0, null
+    )
+
+    errorCode.toInt() to msgBuf.ptr.reinterpret<TCHARVar>().toKString()
 }
 
 fun throwLastError(): Nothing {
     val (errorCode, message) = getLastError()
-    TODO("Not yet implemented")
-//    throw Exception()
+    throw Exception("Error: $errorCode: $message")
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
