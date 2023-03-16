@@ -2,7 +2,7 @@ import platform.windows.HKL
 
 data class VkData(
     val vkCode: Int,
-    val hkl: HKL,
+    val hkl: HKL? = null,
     val shift: Boolean = false,
     val alt: Boolean = false,
     val control: Boolean = false,
