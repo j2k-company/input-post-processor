@@ -2,19 +2,22 @@ import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import platform.posix.fclose
 import platform.posix.fgets
 import platform.posix.fopen
 
-class Preferences(filePath: String) {
-    val substitutions: Map<String, String>
+data class Preferences(
+    val substitutions: Map<String, String>,
+    @Serializable(with = HotKeySerializer::class)
+    val hotKeys: Map<VkData, Action>
+)
 
-    init {
-        val jsonString = readAllText(filePath)
-        substitutions = Json.decodeFromString(jsonString)
-    }
+fun loadPreferences(filePath: String): Preferences {
+    val jsonString = readAllText(filePath)
+    return Json.decodeFromString(jsonString)
 }
 
 // from https://www.nequalsonelifestyle.com/2020/11/16/kotlin-native-file-io/
