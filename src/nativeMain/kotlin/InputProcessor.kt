@@ -1,26 +1,14 @@
 import kotlinx.cinterop.pointed
-import kotlinx.cinterop.staticCFunction
 import kotlinx.cinterop.toCPointer
 import platform.windows.*
 
-
-private var hook: HHOOK? = null
-
-private fun eventHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): LRESULT {
-    return if (!KeyboardHook.processHook(nCode, wParam, lParam))
-        nextHook(hook!!, nCode, wParam, lParam)
-    else 1
-}
-
-object KeyboardHook {
+object InputProcessor {
     private val inputSynthesizer = InputSynthesizer()
-    private val preferences = Preferences("substitutions.json")
-    private val cache = mutableListOf<Char>()
-    private var keyInput = false
+    private val preferences = loadPreferences("substitutions.json")
 
-    fun init() {
-        hook = setHook(WH_KEYBOARD_LL, staticCFunction(::eventHook))
-    }
+    private val cache = mutableListOf<Char>()
+
+    private var keyInput = false
 
     fun processHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): Boolean {
         if (nCode < 0)
@@ -65,6 +53,11 @@ object KeyboardHook {
         return false
     }
 
+    // NOTE: vkCode is virtual-key code of current pressed key
+    private fun isHotKey(vkCode: Int) {
+        TODO("Not yet implemented")
+    }
+
     fun modifierKeysPressed() =
         keyPressed(VK_CONTROL) || keyPressed(VK_MENU) || keyPressed(VK_LWIN) || keyPressed(VK_RWIN)
 
@@ -95,12 +88,5 @@ object KeyboardHook {
         }
 
         return false
-    }
-
-    fun dispose() {
-        if (hook != null) {
-            removeHook(hook!!)
-            hook = null
-        }
     }
 }
