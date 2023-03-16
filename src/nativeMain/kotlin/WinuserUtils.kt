@@ -106,6 +106,17 @@ fun keyCodeToChar(vkCode: Int, scanCode: Int, shiftPressed: Boolean, hkl: HKL) =
     }
 }
 
+fun keyCodeToChar(vkCode: Int, shiftPressed: Boolean, hkl: HKL): Char? {
+    val scanCode = MapVirtualKeyA(vkCode.toUInt(), MAPVK_VK_TO_VSC)
+    return keyCodeToChar(vkCode, scanCode.toInt(), shiftPressed, hkl)
+}
+
+fun getEnglishHkl() {
+    TODO("Not yet implemented")
+}
+
+fun hideConsoleWindow() = ShowWindow(GetConsoleWindow(), SW_HIDE)
+
 //fun activateKeyboardLayout(hkl: HKL) =
 //    ActivateKeyboardLayout(hkl, KLF_SETFORPROCESS) ?: throwLastError()
 
