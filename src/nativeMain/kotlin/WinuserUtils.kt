@@ -115,7 +115,7 @@ fun getEnglishHkl() {
     TODO("Not yet implemented")
 }
 
-fun hideConsoleWindow() = ShowWindow(GetConsoleWindow(), SW_HIDE)
+fun ShowWindow(nCmdShow: Int) = ShowWindow(GetConsoleWindow(), nCmdShow)
 
 //fun activateKeyboardLayout(hkl: HKL) =
 //    ActivateKeyboardLayout(hkl, KLF_SETFORPROCESS) ?: throwLastError()

@@ -22,7 +22,6 @@ fun disposeHook() {
 }
 
 fun main() {
-    hideConsoleWindow()
     initHook()
 
     memScoped {
