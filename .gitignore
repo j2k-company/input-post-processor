@@ -81,3 +81,4 @@ kotlin-ide/
 /.idea/vcs.xml
 /java_pid9432.hprof
 /.idea/uiDesigner.xml
+/substitutions.json

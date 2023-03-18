@@ -17,7 +17,7 @@ class InputSynthesizer {
                 // TODO: Using other method for set specify keyboard layout
                 // HACK:XXX: It's working only for system with two hkl
                 nextKeyboardLayout()
-                currentHKL = it.hkl
+                currentHKL = it.hkl!!
             }
 
             sendKeyPress(

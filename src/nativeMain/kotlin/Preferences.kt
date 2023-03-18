@@ -9,10 +9,13 @@ import platform.posix.fclose
 import platform.posix.fgets
 import platform.posix.fopen
 
+
+typealias HotKey = @Serializable(with = HotKeySerializer::class) VkData
+
+@Serializable
 data class Preferences(
     val substitutions: Map<String, String>,
-    @Serializable(with = HotKeySerializer::class)
-    val hotKeys: Map<VkData, Action>
+    val hotKeys: Map<HotKey, Action>
 )
 
 fun loadPreferences(filePath: String): Preferences {

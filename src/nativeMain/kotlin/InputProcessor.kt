@@ -19,6 +19,22 @@ object InputProcessor {
 
         when (wParam.toInt()) {
             WM_KEYDOWN, WM_SYSKEYDOWN -> {
+                val vkData = VkData(
+                    vkCode = keyCode,
+                    hkl = getKeyboardLayout(),
+                    shift = keyPressed(VK_SHIFT) xor keyToggled(VK_CAPITAL),
+                    alt = keyPressed(VK_MENU),
+                    control = keyPressed(VK_CONTROL),
+                    win = keyPressed(VK_LWIN) or keyPressed(VK_RWIN)
+                )
+
+                val hotKey = preferences.hotKeys.keys.firstOrNull(vkData::equalsWithoutHkl)
+
+                if(hotKey != null) {
+                    preferences.hotKeys[hotKey]?.run() ?: return true
+                    return false
+                }
+
                 if (keyCode == 0x35 && keyPressed(VK_SHIFT)) {
                     keyInput = !keyInput
 
@@ -33,10 +49,8 @@ object InputProcessor {
 
                 if (keyInput && isPrintable(keyCode) && !modifierKeysPressed()) {
                     cache.add(keyCodeToChar(
-                        keyCode,
-                        info.scanCode.toInt(),
-                        keyPressed(VK_SHIFT) xor keyToggled(VK_CAPITAL),
-                        getKeyboardLayout()
+                        vkData.vkCode, info.scanCode.toInt(),
+                        vkData.shift, vkData.hkl!!
                     )!!)
                 } else if (keyInput && keyCode == VK_BACK) {
                     if (cache.size == 0) {
@@ -51,11 +65,6 @@ object InputProcessor {
         }
 
         return false
-    }
-
-    // NOTE: vkCode is virtual-key code of current pressed key
-    private fun isHotKey(vkCode: Int) {
-        TODO("Not yet implemented")
     }
 
     fun modifierKeysPressed() =
@@ -73,20 +82,15 @@ object InputProcessor {
     }
 
     private fun replaceInput(key: String): Boolean {
-        if (key in preferences.substitutions.keys) {
-            inputSynthesizer.apply {
-                releaseModifierKeys()
-                (0..key.length).forEach { _ ->
-                    sendKeyPress(VK_BACK)
-                }
+        val text = preferences.substitutions[key] ?: return false
 
-                sendText(
-                    preferences.substitutions[key]!!
-                )
-            }
-            return true
+        inputSynthesizer.apply {
+            releaseModifierKeys()
+            (0..key.length).forEach { _ -> sendKeyPress(VK_BACK) }
+
+            sendText(text)
         }
 
-        return false
+        return true
     }
 }

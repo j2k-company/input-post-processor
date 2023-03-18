@@ -7,7 +7,12 @@ data class VkData(
     val alt: Boolean = false,
     val control: Boolean = false,
     val win: Boolean = false
-)
+) {
+    fun equalsWithoutHkl(other: VkData) =
+        vkCode == other.vkCode && shift == shift
+                && alt == alt && control == control && win == win
+
+}
 
 sealed class InputData
 
