@@ -2,6 +2,7 @@ import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -15,6 +16,7 @@ typealias HotKey = @Serializable(with = HotKeySerializer::class) VkData
 @Serializable
 data class Preferences(
     val substitutions: Map<String, String>,
+    @SerialName("hot_keys")
     val hotKeys: Map<HotKey, Action>
 )
 
