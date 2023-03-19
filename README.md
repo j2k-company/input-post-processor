@@ -2,9 +2,8 @@
 
 This is a winapi-based utility This is a WinApi-based utility for input interpolation in real-time.
 
-## Using
 
-### Configuration
+## Configuration
 
 For start work with IPP place a file ```substitutions.json``` next to the executable file
 with the filled in according to the following example:
@@ -26,7 +25,7 @@ with the filled in according to the following example:
 }
 ```
 
-#### HotKeys
+### HotKeys
 IPP supports customizable hotkeys to control him.
 Hotkeys are configured as follows:  
 As a field key entered keys combination like a `MODIFIER_KEY+KEY_CHAR`.
@@ -51,16 +50,16 @@ As example: `"hot_key" : {}`
 
 You can create any number of hotkeys for the action.
 
-#### Substitutions
+### Substitutions
 ***Keys are case-sensitive and should consist only of printable characters***
 IPP searches for keys and replaces them with the values you specified in the configuration.
 
-### Start
+## Start
 Now that you have filled out the config, you can just launch the application)
 
-### Using the application
-#### Substitution
+## Using
+### Substitution
 Now that the app is running, try typing in some input field ```%key%``` (where ```key``` is one of the keys from your config) and the application will automatically replace it with the value.
 
-#### HotKeys
+### HotKeys
 Just a try press the hotkey ¯\_(ツ)_/¯
