@@ -9,8 +9,8 @@ data class VkData(
     val win: Boolean = false
 ) {
     fun equalsWithoutHkl(other: VkData) =
-        vkCode == other.vkCode && shift == shift
-                && alt == alt && control == control && win == win
+        vkCode == other.vkCode && shift == other.shift
+                && alt == other.alt && control == other.control && win == other.win
 
 }
 
