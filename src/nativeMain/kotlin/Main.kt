@@ -2,6 +2,9 @@ import kotlinx.cinterop.*
 import platform.windows.*
 
 
+const val PREFERENCES_PATH = "substitutions.json"
+val preferences = loadPreferences(PREFERENCES_PATH)
+
 private var hook: HHOOK? = null
 
 private fun eventHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): LRESULT {

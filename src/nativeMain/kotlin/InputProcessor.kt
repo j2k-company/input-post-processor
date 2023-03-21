@@ -4,11 +4,9 @@ import platform.windows.*
 
 object InputProcessor {
     private val inputSynthesizer = InputSynthesizer()
-    private val preferences = loadPreferences("substitutions.json")
+    private var keyInput = false
 
     private val cache = mutableListOf<Char>()
-
-    private var keyInput = false
 
     fun processHook(nCode: Int, wParam: WPARAM, lParam: LPARAM): Boolean {
         if (nCode < 0)
