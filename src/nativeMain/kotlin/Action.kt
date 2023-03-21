@@ -19,6 +19,19 @@ enum class Action {
         override fun run() {
             ShowWindow(SW_HIDE)
         }
+    },
+    ADD_SUB {
+        override fun run() {
+            ShowWindow(SW_SHOW)
+            print("Input key:")
+            val key = readln()
+            print("Input substitution:")
+            val substitution = readln()
+
+            preferences.substitutions[key] = substitution
+            println("Substitutions successfully added. You can hide window")
+            preferences.save(PREFERENCES_PATH)
+        }
     };
     abstract fun run()
 }

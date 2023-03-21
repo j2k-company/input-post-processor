@@ -5,20 +5,23 @@ import kotlinx.cinterop.toKString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import platform.posix.fclose
-import platform.posix.fgets
-import platform.posix.fopen
+import platform.posix.*
 
 
 typealias HotKey = @Serializable(with = HotKeySerializer::class) VkData
 
 @Serializable
 data class Preferences(
-    val substitutions: Map<String, String>,
+    val substitutions: MutableMap<String, String>,
     @SerialName("hot_keys")
-    val hotKeys: Map<HotKey, Action>
-)
+    val hotKeys: MutableMap<HotKey, Action>
+) {
+    fun save(path: String) {
+        writeAllText(path, Json.encodeToString(this))
+    }
+}
 
 fun loadPreferences(filePath: String): Preferences {
     val jsonString = readAllText(filePath)
@@ -45,4 +48,17 @@ private fun readAllText(filePath: String): String {
     }
 
     return returnBuffer.toString()
+}
+
+// from https://www.nequalsonelifestyle.com/2020/11/16/kotlin-native-file-io/
+fun writeAllText(filePath:String, text:String) {
+    val file = fopen(filePath, "w") ?:
+    throw IllegalArgumentException("Cannot open output file $filePath")
+    try {
+        memScoped {
+            if(fputs(text, file) == EOF) throw Error("File write error")
+        }
+    } finally {
+        fclose(file)
+    }
 }
