@@ -28,10 +28,10 @@ with the filled in according to the following example:
 ### HotKeys
 IPP supports customizable hotkeys to control him.
 Hotkeys are configured as follows:  
-As a field key entered keys combination like a `MODIFIER_KEY+KEY_CHAR`.
+As a field key entered, key combination like a `MODIFIER_KEY+KEY_CHAR`.
 The combination can contain any number of modifier keys and **only one** key of the key char.
 It may also not contain modifier key. ***But char key is required and must be a printable character.
-(if it is a letter is it desirable that it be written in uppercase)***
+(If it is a letter is it desirable that it be written in uppercase)***
 
 Here's the list of modifier keys: `WIN`, `ALT`, `SHIFT`, `CTRL`.
 ***They should be written only in this form.***
@@ -39,7 +39,7 @@ Here's the list of modifier keys: `WIN`, `ALT`, `SHIFT`, `CTRL`.
 Keys separated by `+` symbol and written without spaces.
 
 
-As a value entered the action to be performed when pressing the hotkey.
+As a value entered, the action to be performed when pressing the hotkey.
 The following actions are currently supported:
  * `SHUTDOWN` - shut down the IPP
  * `SHOW_WINDWOW` - show the console window of the IPP
@@ -59,7 +59,8 @@ Now that you have filled out the config, you can just launch the application)
 
 ## Using
 ### Substitution
-Now that the app is running, try typing in some input field ```%key%``` (where ```key``` is one of the keys from your config) and the application will automatically replace it with the value.
+Now that the app is running, try typing in some input field ```%key%```
+(where ```key``` is one of the keys from your config) and the application will automatically replace it with the value.
 
 ### HotKeys
 Just a try press the hotkey ¯\\\_(ツ)_/¯
